@@ -2,10 +2,7 @@ version: '3.8'
 
 services:
   zhiyin:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: zhiyin:latest
+    image: qwex333/zhiyin:latest
     container_name: zhiyin
     
     ports:
@@ -13,22 +10,23 @@ services:
     
     volumes:
       # 音乐目录（只读）- 请修改为你的实际路径，如需更多路径，先在这里挂载目录，然后在 config.toml 中添加 docker路径
+      # 示例：- /vol1/1000/Music:/music:ro
       - ./music:/music:ro
       
       # 数据库目录（持久化）
       - ./data:/data
-      
-      # 封面缓存目录(可选， 如果想手动管理封面)
-      - ./covers:/covers
-      
-      
-      # Web 前端（可选，将前端构建产物挂载到容器）
-      # 示例：- ./web:/app/web:ro
-      
-      # 配置文件（可选，如需自定义配置请取消注释）
+
+      # 配置文件
       # 首次使用：cp config.toml.example config.toml
       # 然后修改 config.toml 中的配置
       - ./config.toml:/app/config.toml:ro
+      
+      # 封面缓存目录(可选， 如果想手动管理封面)
+      # - ./covers:/covers
+      
+      
+      # Web 前端（可选，将前端构建产物挂载到容器）
+      # - ./web:/app/web:ro
     
     environment:
       # 日志级别
