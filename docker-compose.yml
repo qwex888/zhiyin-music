@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  zhiyin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: zhiyin:latest
+    container_name: zhiyin
+    
+    ports:
+      - "8080:8080"
+    
+    volumes:
+      # 音乐目录（只读）- 请修改为你的实际路径，如需更多路径，先在这里挂载目录，然后在 config.toml 中添加 docker路径
+      - ./music:/music:ro
+      
+      # 数据库目录（持久化）
+      - ./data:/data
+      
+      # 封面缓存目录(可选， 如果想手动管理封面)
+      - ./covers:/covers
+      
+      
+      # Web 前端（可选，将前端构建产物挂载到容器）
+      # 示例：- ./web:/app/web:ro
+      
+      # 配置文件（可选，如需自定义配置请取消注释）
+      # 首次使用：cp config.toml.example config.toml
+      # 然后修改 config.toml 中的配置
+      - ./config.toml:/app/config.toml:ro
+    
+    environment:
+      # 日志级别
+      - RUST_LOG=info
+      
+      # 初始管理员（仅首次启动时生效，创建后可删除）
+      # - MUSIC_ADMIN_USER=admin
+      # - MUSIC_ADMIN_PASSWORD=your_secure_password
+      
+      # 注意：其他配置项请在 config.toml 中修改
+    
+    restart: unless-stopped
+    
+    # 健康检查（镜像中未安装 curl/wget，使用内置二进制的 HTTP 自检）
+    # 如安装了 wget 可替换为: test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/health || exit 1"]
+    healthcheck:
+      test: ["CMD", "zhiyin", "--health-check"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    
+    networks:
+      - music-network
+
+networks:
+  music-network:
+    driver: bridge
+
+# 使用说明：
+# 1. 复制配置文件：cp config.toml.example config.toml
+# 2. 修改 config.toml 中的配置：
+#    - 音乐扫描目录（roots）
+#    - 数据库路径（path）
+#    - 其他可选配置
+# 3. 修改 volumes 中的音乐目录路径（./music 改为你的实际路径）
+# 4. 运行: docker-compose up -d
+# 5. 查看日志: docker-compose logs -f
+# 6. 停止服务: docker-compose down
+# 7. 访问 API: http://localhost:8080/api/songs
+# 8. 访问文档: http://localhost:8080/swagger-ui
+#
+# 配置热重载（无需重启）：
+#   docker-compose kill -s SIGHUP zhiyin
+

@@ -1,0 +1,26 @@
+# Logs
+logs
+*.log
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs
+*.njsproj
+*.sln
+*.sw?
+
+# Build output
+dist
+coverage
+
+# Environment variables
+.env
+.env.*
+
+# Trae
+.trae/

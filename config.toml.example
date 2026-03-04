@@ -1,0 +1,217 @@
+# Zhiyin 知音 配置文件示例
+# 
+# 使用说明：
+#   1. 复制此文件为 config.toml：cp config.toml.example config.toml
+#   2. 根据你的环境修改配置（本地开发或 Docker）
+#   3. config.toml 不会被提交到 Git（已加入 .gitignore）
+#
+# 配置热重载：
+#   - 本地开发：修改后自动重载（需重启服务）
+#   - Docker：执行 docker-compose kill -s SIGHUP zhiyin
+
+[server]
+# 监听地址
+# Docker 部署必须使用 "0.0.0.0"（容器网络需要）
+# 本地开发建议 "127.0.0.1"（仅本机可访问，更安全）
+host = "0.0.0.0"
+port = 8080
+
+[scan]
+# 音乐扫描根目录（支持多个路径）
+# 
+# 本地开发示例：
+#   roots = ["/Users/你的用户名/Music", "/Volumes/外置硬盘/Music"]
+#
+# Docker 部署示例（对应 docker-compose.yml 中的挂载）：
+#   roots = ["/music"]
+#
+roots = ["/music"]
+
+# 扫描模式：manual（手动）/ scheduled（定时）/ watch（监听）
+mode = "manual"
+
+# 定时扫描间隔（小时），仅在 scheduled 模式下生效
+interval_hours = 24
+
+# 是否跳过过小的音频文件（空文件、损坏文件等）
+skip_small_files = true
+
+# 最小文件大小（字节），低于此值的文件将被跳过（默认 1024 = 1KB）
+min_file_size = 1024
+
+[database]
+# 数据库文件路径
+#
+# 本地开发示例：
+#   path = "./data/db.sqlite"
+#
+# Docker 部署示例：
+#   path = "/data/db.sqlite"
+#
+path = "/data/db.sqlite"
+
+# 连接池大小（NAS 低内存场景建议 2~4）
+pool_size = 4
+
+[covers]
+# 封面缓存目录
+#
+# 本地开发示例：
+#   cache_path = "./covers"
+#
+# Docker 部署示例：
+#   cache_path = "/covers"
+#
+cache_path = "/covers"
+
+# 原图最大边长（像素），入库时超过此值的封面会等比缩放
+max_dimension = 1000
+
+# 缩略图编码质量（JPEG 压缩质量，0-100）
+quality = 85
+
+# 封面内存缓存（MB），NAS 低内存场景建议 10~20，0 表示禁用
+cache_size_mb = 20
+
+# 封面提取策略优先级：
+# 1. embedded: 内嵌在音频文件中的封面
+# 2. same_name: 与音频文件同名的图片文件
+# 3. standard_names: 使用标准文件名的封面文件
+
+# 标准封面文件名列表（按优先级排序，不区分大小写）
+standard_names = [
+    "cover",
+    "folder",
+    "front",
+    "album",
+    "albumart",
+    "albumartsmall"
+]
+
+# 支持的图片格式扩展名
+image_extensions = ["jpg", "jpeg", "png", "webp"]
+
+[recommend]
+# 推荐任务执行间隔（小时）
+job_interval_hours = 24
+
+# 触发推荐计算的播放次数阈值
+play_threshold = 10
+
+# 推荐结果最大数量
+max_results = 50
+
+[transcode]
+# 是否启用转码功能
+enabled = true
+
+# 转码缓存目录
+#
+# 本地开发示例：
+#   cache_path = "./data/transcoded"
+#
+# Docker 部署示例：
+#   cache_path = "/data/transcoded"
+#
+cache_path = "/data/transcoded"
+
+# 缓存策略: none（不缓存）、all（缓存所有）、smart（智能缓存）
+cache_strategy = "smart"
+
+# 智能缓存阈值（播放次数超过此值的歌曲会被预转码）
+cache_threshold = 10
+
+# 最大并发转码任务数
+max_concurrent_transcodes = 2
+
+[maintenance]
+# 是否启用自动数据库维护
+enabled = true
+
+# 维护任务执行间隔（小时）
+interval_hours = 24
+
+# 播放历史保留天数（0 表示不删除）
+history_retention_days = 90
+
+# 推荐缓存保留天数（0 表示不删除）
+recommendation_retention_days = 30
+
+# 是否启用增量 VACUUM（碎片清理）
+enable_vacuum = true
+
+# VACUUM 触发的碎片率阈值（百分比，0-100）
+# 只有当数据库碎片率超过此值时才执行 VACUUM
+vacuum_threshold = 30.0
+
+# 相似度权重配置
+[recommend.weights]
+artist = 0.3      # 艺术家相似度权重
+album = 0.2       # 专辑相似度权重
+genre = 0.3       # 流派相似度权重
+year = 0.1        # 年代相似度权重
+play_count = 0.1  # 播放次数权重
+
+[jobs]
+# 后台任务配置
+
+# 任务保留天数（历史任务记录）
+retention_days = 30
+
+# 任务清理间隔（小时）
+cleanup_interval_hours = 24
+
+[subsonic]
+# 是否启用 Subsonic API 兼容层（/rest/ 路径）
+enabled = true
+
+# 首次启动时通过环境变量或 /api/setup 创建管理员
+
+[web]
+# 是否启用 Web 前端静态文件服务
+enabled = true
+
+# 前端构建产物目录
+#
+# 本地开发示例：
+#   path = "./web"
+#
+# Docker 部署示例：
+#   path = "/app/web"
+#
+path = "/app/web"
+
+[security]
+# JWT 密钥（强烈建议设置固定值，否则每次重启服务后所有用户需重新登录）
+# 生成方式: openssl rand -hex 32
+# jwt_secret = "your-random-hex-secret-here"
+
+# Token 有效期（小时），默认 168（7 天）
+token_expiry_hours = 168
+
+# Subsonic 密码加密密钥（用于加密存储 Subsonic Token 认证所需的密码）
+# 强烈建议修改为自定义值！
+encryption_key = "zhiyin-default-key-CHANGE-ME"
+
+# CORS 允许的来源（空列表或 ["*"] 表示允许所有来源）
+# 生产环境建议配置为前端的实际地址
+# cors_origins = ["https://music.example.com", "http://localhost:3000"]
+cors_origins = []
+
+# 登录限流：窗口期内最大尝试次数（0 表示不限制）
+login_rate_limit = 10
+
+# 登录限流窗口期（秒），默认 300 秒（5 分钟）
+login_rate_window_secs = 300
+
+[logging]
+# 日志级别：trace / debug / info / warn / error
+level = "info"
+
+# 日志格式：json / pretty
+format = "pretty"
+
+# 模块日志级别配置（可选）
+# 例如: ["zhiyin=debug", "axum=info", "tower_http=debug"]
+modules = []
+

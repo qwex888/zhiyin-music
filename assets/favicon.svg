@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="arcA" x1="82" y1="62" x2="66" y2="46" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#c084fc"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="arcB" x1="46" y1="66" x2="62" y2="82" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Circle A: center (51.5,76.5), r=33.75, gap at 315° -->
+  <path d="M 82.1 62.2 A 33.75 33.75 0 1 1 65.8 45.9"
+        stroke="url(#arcA)" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+  <!-- Circle B: center (76.5,51.5), r=33.75, gap at 135° -->
+  <path d="M 45.9 65.8 A 33.75 33.75 0 1 1 62.2 82.1"
+        stroke="url(#arcB)" stroke-width="8" stroke-linecap="round" fill="none"/>
+</svg>
