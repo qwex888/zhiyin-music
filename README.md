@@ -2,212 +2,217 @@
   <img src="assets/logo.svg" width="128" alt="Zhiyin Logo" />
 </p>
 
-<h1 align="center">Zhiyin 知音</h1>
+<h1 align="center">Zhiyin</h1>
 
-<p align="center">基于 Rust 的远程 NAS 音乐库 + Web 播放器系统</p>
+<p align="center">A Rust-based remote NAS music library + Web player system</p>
+
+<p align="center">
+  <a href="README_CN.md">中文文档</a>
+</p>
 
 [![Rust](https://img.shields.io/badge/rust-1.75+-orange.svg)](https://www.rust-lang.org/)
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-## 📖 项目简介
+## 📖 Overview
 
-Zhiyin 知音 是一个专为 NAS 场景设计的音乐流媒体服务，旨在提供：
+Zhiyin is a music streaming service designed for NAS environments, offering:
 
-- 🎼 **大规模音乐库支持**：轻松管理数万首音乐
-- 🚀 **高性能**：Rust + SQLite + 异步架构，内存优化至 ~30-50MB
-- 📦 **开箱即用**：Docker 一键部署
-- 🔍 **智能推荐**：基于播放历史的离线推荐系统
-- 🎨 **完整元数据**：封面、艺术家、专辑信息自动解析
-- 🌐 **RESTful API**：前后端分离，易于集成
-- 📡 **Subsonic API 兼容**：支持音流、Symfonium、DSub 等主流客户端直连
-- 🔐 **用户认证**：JWT + Basic Auth + bcrypt，角色权限控制
-- 🖥️ **前端托管**：可选的内置 Web 前端服务，支持 SPA
+- 🎼 **Large-scale Music Library**: Easily manage tens of thousands of tracks
+- 🚀 **High Performance**: Rust + SQLite + async architecture, memory optimized to ~30-50MB
+- 📦 **Ready to Use**: One-click Docker deployment
+- 🔍 **Smart Recommendations**: Offline recommendation engine based on listening history
+- 🎨 **Full Metadata Support**: Automatic parsing of cover art, artist, and album info
+- 🌐 **RESTful API**: Front-end / back-end separation, easy integration
+- 📡 **Subsonic API Compatible**: Works with Symfonium, DSub, Ultrasonic, and other popular clients
+- 🔐 **User Authentication**: JWT + Basic Auth + bcrypt with role-based access control
+- 🖥️ **Frontend Hosting**: Optional built-in Web frontend service with SPA support
 
-## ✨ 核心特性
+## ✨ Features
 
-### 1. 音乐库管理
-- ✅ 支持多个音乐根目录
-- ✅ 增量扫描（基于 mtime/size/hash）
-- ✅ 实时文件监听（可选）
-- ✅ 支持格式：MP3、FLAC、WAV、M4A、OGG、OPUS、APE
+### 1. Music Library Management
+- ✅ Multiple music root directories
+- ✅ Incremental scanning (based on mtime/size/hash)
+- ✅ Real-time file watching (optional)
+- ✅ Supported formats: MP3, FLAC, WAV, M4A, OGG, OPUS, APE
 
-### 2. 元数据解析
-- ✅ 使用 TagLib 解析音频元信息
-- ✅ 自动提取内嵌封面
-- ✅ 支持外部封面文件（cover.jpg、folder.jpg）
-- ✅ 封面哈希去重，节省存储空间
+### 2. Metadata Parsing
+- ✅ Audio metadata parsing with TagLib
+- ✅ Automatic extraction of embedded cover art
+- ✅ External cover file support (cover.jpg, folder.jpg)
+- ✅ Cover deduplication via hash to save storage
 
-### 3. 音频播放
-- ✅ HTTP Range 请求支持（无缝 seek）
-- ✅ **多档音质选择（128k/192k/320k/无损）**
-- ✅ **智能转码缓存（基于播放次数）**
-- ✅ **FFmpeg 管道流式输出**（实时转码边转边播，无需等待完整文件）
-- ✅ 原格式播放（无需转码）
-- ✅ 播放历史记录
+### 3. Audio Playback
+- ✅ HTTP Range request support (seamless seeking)
+- ✅ **Multi-tier quality selection (128k/192k/320k/lossless)**
+- ✅ **Smart transcode caching (based on play count)**
+- ✅ **FFmpeg pipe streaming** (real-time transcode, play while encoding)
+- ✅ Original format playback (no transcoding)
+- ✅ Play history tracking
 
-### 3.5 Subsonic API 兼容
-- ✅ **Subsonic API v1.16.1 兼容层**（挂载于 `/rest/`，40+ 端点）
-- ✅ 支持音流、Ultrasonic、Symfonium、DSub 等主流客户端
-- ✅ 多种认证方式（明文密码 / Hex 编码 / Token 认证）
-- ✅ XML/JSON 双格式响应（`f=json` / `f=xml`）
-- ✅ **已实现端点**：
-  - 🔹 系统：`ping`、`getLicense`、`getUser`
-  - 🔹 浏览：`getMusicFolders`、`getIndexes`、`getArtists`、`getArtist`、`getAlbum`、`getSong`、`getRandomSongs`、`getAlbumList2`
-  - 🔹 媒体：`stream`、`download`、`getCoverArt`
-  - 🔹 搜索：`search3`、`search2`（ID3 搜索）
-  - 🔹 记录：`scrobble`（播放记录上报）
-  - 🔹 扫描：`getScanStatus`、`startScan`（实时进度）
-- ⬜ **Stub 端点**（已注册路由，返回空响应保证客户端不报错）：
-  - 播放列表、收藏/评分、书签、歌词、相似推荐、电台/播客等
+### 3.5 Subsonic API Compatibility
+- ✅ **Subsonic API v1.16.1 compatibility layer** (mounted at `/rest/`, 40+ endpoints)
+- ✅ Works with Ultrasonic, Symfonium, DSub, and other mainstream clients
+- ✅ Multiple auth methods (plaintext password / hex-encoded / token auth)
+- ✅ Dual XML/JSON response format (`f=json` / `f=xml`)
+- ✅ **Implemented endpoints**:
+  - 🔹 System: `ping`, `getLicense`, `getUser`
+  - 🔹 Browsing: `getMusicFolders`, `getIndexes`, `getArtists`, `getArtist`, `getAlbum`, `getSong`, `getRandomSongs`, `getAlbumList2`
+  - 🔹 Media: `stream`, `download`, `getCoverArt`
+  - 🔹 Search: `search3`, `search2` (ID3 search)
+  - 🔹 Annotation: `scrobble` (play history reporting)
+  - 🔹 Library: `getScanStatus`, `startScan` (real-time progress)
+- ⬜ **Stub endpoints** (routes registered, returning empty responses for client compatibility):
+  - Playlists, favorites/ratings, bookmarks, lyrics, similar recommendations, radio/podcasts, etc.
 
-### 4. 用户认证与权限
-- ✅ 用户系统（SQLite `users` 表，bcrypt 密码存储）
-- ✅ JWT Token 认证（REST API）
-- ✅ Basic Auth 认证（REST API）
-- ✅ 角色权限控制（admin / user）
-- ✅ 初始管理员创建（环境变量 或 `POST /api/setup`）
-- ✅ 用户管理 API（创建/修改/删除/重置密码）
-- ✅ Subsonic API 统一使用数据库用户认证
+### 4. User Authentication & Permissions
+- ✅ User system (SQLite `users` table, bcrypt password hashing)
+- ✅ JWT Token authentication (REST API)
+- ✅ Basic Auth authentication (REST API)
+- ✅ Role-based access control (admin / user)
+- ✅ Initial admin creation (environment variable or `POST /api/setup`)
+- ✅ User management API (create/update/delete/reset password)
+- ✅ Subsonic API uses unified database user authentication
 
-### 5. Web 前端托管（可选）
-- ✅ 内置 HTTP 静态文件服务
-- ✅ SPA 路由 fallback（自动回退到 `index.html`）
-- ✅ 通过 Docker volume 挂载或直接放置前端构建产物
-- ✅ 可随时替换为任意前端框架构建产物
+### 5. Web Frontend Hosting (Optional)
+- ✅ Built-in HTTP static file server
+- ✅ SPA route fallback (auto fallback to `index.html`)
+- ✅ Mount via Docker volume or place frontend build output directly
+- ✅ Swap in any frontend framework build output at any time
 
-### 6. 个性化推荐
-- ✅ 高频播放推荐
-- ✅ 最近常听推荐
-- ✅ 相似度推荐（艺术家/专辑/目录）
-- ✅ 后台异步计算，不阻塞 API
+### 6. Personalized Recommendations
+- ✅ Frequently played recommendations
+- ✅ Recently listened recommendations
+- ✅ Similarity-based recommendations (artist/album/directory)
+- ✅ Async background computation, non-blocking API
 
-### 7. Docker 部署
-- ✅ 多阶段构建，镜像体积小
-- ✅ 支持 x86_64 和 ARM64
-- ✅ 健康检查与自动重启
-- ✅ 数据持久化
+### 7. Docker Deployment
+- ✅ Multi-stage build, small image size
+- ✅ Supports x86_64 and ARM64
+- ✅ Health checks and auto-restart
+- ✅ Data persistence
 
-## 🏗️ 架构设计
+## 🏗️ Architecture
 
 ```
 API Layer → Service Layer → Job System → Data Access
     ↓           ↓               ↓            ↓
- Axum      业务逻辑        后台任务      SQLite
+  Axum     Business Logic   Background    SQLite
+                              Jobs
 ```
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 方式一：Docker Compose（推荐）
+### Option 1: Docker Compose (Recommended)
 
-**修改配置**
+**Configure Settings**
 
-编辑 `docker-compose.yml`，设置你的音乐目录：
+Edit `docker-compose.yml` to set your music directory:
 ```yaml
 volumes:
-  - /path/to/your/music:/music:ro  # 修改为实际路径
+  - /path/to/your/music:/music:ro  # Change to your actual path
 ```
 
-创建配置文件
+Create the configuration file:
 ```bash
-cp config.toml.example config.toml
+cp config.toml.example.en config.toml
 ```
 
-**启动服务**
+**Start the Service**
 ```bash
 docker-compose up -d
 ```
 
-**创建管理员**
+**Create Admin User**
 
-方式一：通过前端页面，会在系统初始化时自动引导创建。
+Option A: Via the Web frontend — the system will guide you through setup on first launch.
 
-方式二：通过环境变量（在 `docker-compose.yml` 中设置）：
+Option B: Via environment variables (set in `docker-compose.yml`):
 ```yaml
 environment:
   - MUSIC_ADMIN_USER=admin
   - MUSIC_ADMIN_PASSWORD=your_secure_password
 ```
 
-方式三：通过 API 初始化：
+Option C: Via API:
 ```bash
 curl -X POST http://localhost:8080/api/setup \
   -H "Content-Type: application/json" \
   -d '{"username": "admin", "password": "your_secure_password"}'
 ```
 
-**触发扫描**
+**Trigger a Scan**
 
-前端设置页面，手动触发扫描和配置扫描
+Use the Web frontend settings page to manually trigger or configure scans.
 
-或
+Or via API:
 
 ```bash
 curl -X POST http://localhost:8080/api/scan \
   -H "Authorization: Bearer <your-jwt-token>"
 ```
 
-8. **访问 API**
+**Access the API**
 
-- API 文档地址：http://localhost:8080/swagger-ui
+- API docs: http://localhost:8080/swagger-ui
 
-## 📚 API 文档
+## 📚 API Reference
 
-### 核心接口
+### Core Endpoints
 
-#### 公开接口（无需认证）
+#### Public Endpoints (No Auth Required)
 
-| 接口 | 方法 | 描述 |
-|------|-----|------|
-| `/api/auth/status` | GET | 查询系统初始化状态 |
-| `/api/setup` | POST | 首次创建管理员（仅限系统未初始化时） |
-| `/api/auth/login` | POST | 登录获取 JWT Token |
-| `/api/health` | GET | 健康检查 |
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth/status` | GET | Check system initialization status |
+| `/api/setup` | POST | Create initial admin (only when system is uninitialized) |
+| `/api/auth/login` | POST | Login to obtain JWT token |
+| `/api/health` | GET | Health check |
 
-#### 需要认证的接口
+#### Authenticated Endpoints
 
-| 接口 | 方法 | 描述 |
-|------|-----|------|
-| `/api/songs` | GET | 获取歌曲列表（分页） |
-| `/api/songs/:id` | GET | 获取单个歌曲详情 |
-| `/api/songs/batch` | POST | 批量查询歌曲详情 |
-| `/api/albums` | GET | 获取专辑列表 |
-| `/api/artists` | GET | 获取艺术家列表（含歌曲数、专辑数、封面） |
-| `/api/stream/{id}?quality=high` | GET | 播放音频（支持音质选择+Range） |
-| `/api/covers/{id}` | GET | 获取封面图片 |
-| `/api/scan` | POST | 触发扫描任务 |
-| `/api/recommend` | GET | 获取推荐歌曲（含完整歌曲信息） |
-| `/api/history/recent` | GET | 获取最近播放的歌曲 |
-| `/api/config` | GET | 获取当前配置（含重启标记） |
-| `/api/config` | PUT | 更新配置（自动保存并重载） |
-| `/api/users` | GET | 获取用户列表（管理员） |
-| `/api/users` | POST | 创建用户（管理员） |
-| `/api/users/me` | GET | 获取当前用户信息 |
-| `/api/users/:id` | PUT | 更新用户信息 |
-| `/api/users/me/password` | PUT | 修改自己的密码 |
-| `/api/users/:id/reset-password` | POST | 重置用户密码（管理员） |
-| `/api/users/:id` | DELETE | 删除用户（管理员） |
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/songs` | GET | List songs (paginated) |
+| `/api/songs/:id` | GET | Get song details |
+| `/api/songs/batch` | POST | Batch query song details |
+| `/api/albums` | GET | List albums |
+| `/api/artists` | GET | List artists (with song count, album count, cover) |
+| `/api/stream/{id}?quality=high` | GET | Stream audio (quality selection + Range) |
+| `/api/covers/{id}` | GET | Get cover art |
+| `/api/scan` | POST | Trigger scan job |
+| `/api/recommend` | GET | Get recommended songs (with full song info) |
+| `/api/history/recent` | GET | Get recently played songs |
+| `/api/config` | GET | Get current config (with restart flags) |
+| `/api/config` | PUT | Update config (auto-save and reload) |
+| `/api/users` | GET | List users (admin) |
+| `/api/users` | POST | Create user (admin) |
+| `/api/users/me` | GET | Get current user info |
+| `/api/users/:id` | PUT | Update user |
+| `/api/users/me/password` | PUT | Change own password |
+| `/api/users/:id/reset-password` | POST | Reset user password (admin) |
+| `/api/users/:id` | DELETE | Delete user (admin) |
 
-#### Subsonic 兼容接口
+#### Subsonic Compatible Endpoints
 
-| 接口 | 方法 | 描述 |
-|------|-----|------|
-| `/rest/ping` | GET | 心跳检测 |
-| `/rest/getArtists` | GET | 获取艺术家索引 |
-| `/rest/stream?id=1` | GET | 流式播放 |
-| `/rest/search3?query=xxx` | GET | 搜索 |
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/rest/ping` | GET | Heartbeat |
+| `/rest/getArtists` | GET | Get artist index |
+| `/rest/stream?id=1` | GET | Stream playback |
+| `/rest/search3?query=xxx` | GET | Search |
 
 ---
 
-### 歌曲接口
+### Songs
 
-#### 1. 获取歌曲列表（分页）
+#### 1. List Songs (Paginated)
 
 ```bash
 curl "http://localhost:8080/api/songs?limit=10&offset=0"
 ```
 
-**响应：**
+**Response:**
 ```json
 {
   "data": [
@@ -237,13 +242,13 @@ curl "http://localhost:8080/api/songs?limit=10&offset=0"
 }
 ```
 
-#### 2. 获取单个歌曲详情
+#### 2. Get Song Details
 
 ```bash
 curl http://localhost:8080/api/songs/1
 ```
 
-**响应：**
+**Response:**
 ```json
 {
   "id": 1,
@@ -266,15 +271,15 @@ curl http://localhost:8080/api/songs/1
 }
 ```
 
-**错误响应（404）：**
+**Error Response (404):**
 ```json
 {
   "error": "not_found",
-  "message": "歌曲 ID 1 不存在"
+  "message": "Song ID 1 not found"
 }
 ```
 
-#### 3. 批量查询歌曲详情
+#### 3. Batch Query Songs
 
 ```bash
 curl -X POST http://localhost:8080/api/songs/batch \
@@ -282,7 +287,7 @@ curl -X POST http://localhost:8080/api/songs/batch \
   -d '{"ids": [1, 2, 3, 4, 5]}'
 ```
 
-**响应：**
+**Response:**
 ```json
 [
   {
@@ -302,20 +307,19 @@ curl -X POST http://localhost:8080/api/songs/batch \
 ]
 ```
 
-> 注意：不存在的歌曲 ID 会被自动过滤，结果按输入 ID 顺序返回。
+> Note: Non-existent song IDs are automatically filtered out. Results are returned in the order of input IDs.
 
 ---
 
-### 艺术家接口
+### Artists
 
-#### 获取艺术家列表（含统计信息）
+#### List Artists (with Statistics)
 
 ```bash
-# 获取艺术家列表
 curl "http://localhost:8080/api/artists?limit=20&offset=0"
 ```
 
-**响应示例**:
+**Response:**
 ```json
 {
   "items": [
@@ -351,34 +355,34 @@ curl "http://localhost:8080/api/artists?limit=20&offset=0"
 }
 ```
 
-**增强功能**:
-- **歌曲数量** (`song_count`): 该艺术家的歌曲总数
-- **专辑数量** (`album_count`): 该艺术家的专辑总数
-- **封面 ID** (`cover_id`): 艺术家代表封面，可为 `null`
+**Fields**:
+- **song_count**: Total number of songs by this artist
+- **album_count**: Total number of albums by this artist
+- **cover_id**: Representative cover art, can be `null`
 
-**封面获取策略**（优先级顺序）:
-1. **最新专辑封面** - 优先选择该艺术家最新发行的专辑封面（按 year 降序）
-2. **首张有封面专辑** - 如果没有 year 信息，则选择第一张有封面的专辑
-3. **歌曲封面** - 如果专辑都没有封面，则从该艺术家的歌曲中选择一个封面
-4. **NULL** - 如果都没有封面，返回 `null`，前端可显示默认占位图
+**Cover Selection Strategy** (by priority):
+1. **Latest album cover** — prefer the most recent album cover (sorted by year descending)
+2. **First album with cover** — if no year info, pick the first album that has a cover
+3. **Song cover** — if no album covers exist, pick a cover from the artist's songs
+4. **NULL** — if no covers at all, return `null`; frontend can show a placeholder
 
-**获取封面图片**:
+**Fetching cover art**:
 ```bash
-# 如果 cover_id 不为 null
+# If cover_id is not null
 curl http://localhost:8080/api/covers/123 > artist_cover.jpg
 ```
 
 ---
 
-### 推荐接口
+### Recommendations
 
-#### 获取推荐歌曲（含完整歌曲信息）
+#### Get Recommended Songs (with Full Song Info)
 
 ```bash
 curl http://localhost:8080/api/recommend
 ```
 
-**响应：**
+**Response:**
 ```json
 [
   {
@@ -396,29 +400,29 @@ curl http://localhost:8080/api/recommend
 ]
 ```
 
-> 推荐结果按评分从高到低排序，包含完整的歌曲元数据，可直接用于播放器展示。
+> Results are sorted by score (highest first) and include full song metadata, ready for player display.
 
 ---
 
-### 播放历史接口
+### Play History
 
-#### 获取最近播放的歌曲（含完整歌曲信息）
+#### Get Recently Played Songs (with Full Song Info)
 
 ```bash
-# 获取最近 20 首（默认）
+# Get last 20 (default)
 curl http://localhost:8080/api/history/recent
 
-# 获取最近 50 首
+# Get last 50
 curl "http://localhost:8080/api/history/recent?limit=50"
 
-# 获取最近 100 首（最大值）
+# Get last 100 (maximum)
 curl "http://localhost:8080/api/history/recent?limit=100"
 ```
 
-**查询参数**:
-- `limit` (可选): 返回的歌曲数量，默认 20，最大 100
+**Query Parameters**:
+- `limit` (optional): Number of songs to return, default 20, max 100
 
-**响应：**
+**Response:**
 ```json
 [
   {
@@ -435,23 +439,23 @@ curl "http://localhost:8080/api/history/recent?limit=100"
 ]
 ```
 
-**特性**:
-- 返回最近播放的歌曲（去重，每首歌只返回最后一次播放时间）
-- 按播放时间倒序排列（最新的在前）
-- 包含完整歌曲信息和最后播放时间 `played_at`
-- 支持自定义返回数量（1-100 首）
+**Behavior**:
+- Returns recently played songs (deduplicated, showing only the last play time per song)
+- Sorted by play time descending (most recent first)
+- Includes full song info and `played_at` timestamp
+- Supports custom result count (1-100)
 
 ---
 
-### 配置管理接口
+### Configuration Management
 
-#### 1. 获取当前配置
+#### 1. Get Current Configuration
 
 ```bash
 curl http://localhost:8080/api/config
 ```
 
-**响应示例**:
+**Response:**
 ```json
 {
   "scan": {
@@ -460,7 +464,7 @@ curl http://localhost:8080/api/config
     "interval_hours": 24,
     "_meta": {
       "mode": {
-        "description": "扫描模式：manual/scheduled/watch",
+        "description": "Scan mode: manual/scheduled/watch",
         "requires_restart": false,
         "default_value": "manual"
       }
@@ -475,9 +479,9 @@ curl http://localhost:8080/api/config
 }
 ```
 
-> 每个配置项的 `_meta` 字段标注了该配置是否需要重启服务才能生效。
+> The `_meta` field for each config item indicates whether a service restart is required for the change to take effect.
 
-#### 2. 更新配置
+#### 2. Update Configuration
 
 ```bash
 curl -X PUT http://localhost:8080/api/config \
@@ -493,11 +497,11 @@ curl -X PUT http://localhost:8080/api/config \
   }'
 ```
 
-**响应示例**:
+**Response:**
 ```json
 {
   "success": true,
-  "message": "成功更新 3 项配置",
+  "message": "Successfully updated 3 config items",
   "requires_restart": false,
   "updated_fields": [
     "scan.mode",
@@ -507,51 +511,51 @@ curl -X PUT http://localhost:8080/api/config \
 }
 ```
 
-**特性**:
-- 支持部分更新（只更新指定的字段）
-- 自动保存到 `config.toml` 文件
-- 自动触发配置重载（Unix 系统）
-- 明确标注是否需要重启
+**Behavior**:
+- Supports partial updates (only update specified fields)
+- Auto-saves to `config.toml`
+- Auto-triggers config reload (Unix systems)
+- Clearly indicates if restart is needed
 
-**可更新的配置项**:
-- 扫描配置：`scan.roots`、`scan.mode`、`scan.interval_hours`
-- 推荐配置：`recommend.job_interval_hours`、`recommend.play_threshold`、`recommend.max_results`
-- 转码配置：`transcode.enabled`、`transcode.cache_strategy`、`transcode.cache_threshold`
-- 维护配置：`maintenance.*`（所有维护相关配置）
+**Updatable config items**:
+- Scan: `scan.roots`, `scan.mode`, `scan.interval_hours`
+- Recommendations: `recommend.job_interval_hours`, `recommend.play_threshold`, `recommend.max_results`
+- Transcoding: `transcode.enabled`, `transcode.cache_strategy`, `transcode.cache_threshold`
+- Maintenance: `maintenance.*` (all maintenance-related settings)
 
-**不可修改的配置**（需要重启）:
-- `server.host`、`server.port`
-- `database.path`、`database.pool_size`
+**Non-updatable config** (requires restart):
+- `server.host`, `server.port`
+- `database.path`, `database.pool_size`
 - `transcode.cache_path`
 
-> 完整 API 文档请访问 Swagger UI：`http://localhost:8080/swagger-ui/`
+> Full API docs available at Swagger UI: `http://localhost:8080/swagger-ui/`
 
 ---
 
-### 认证接口
+### Authentication
 
-#### 1. 系统初始化（创建首个管理员）
+#### 1. System Setup (Create First Admin)
 
 ```bash
-# 查看初始化状态
+# Check initialization status
 curl http://localhost:8080/api/auth/status
 ```
 
 ```json
 {
   "initialized": false,
-  "message": "系统尚未初始化，请创建管理员账户"
+  "message": "System not initialized. Please create an admin account."
 }
 ```
 
 ```bash
-# 创建管理员（仅限首次，初始化后此接口自动关闭）
+# Create admin (first-time only; endpoint is disabled after initialization)
 curl -X POST http://localhost:8080/api/setup \
   -H "Content-Type: application/json" \
   -d '{"username": "admin", "password": "your_secure_password"}'
 ```
 
-#### 2. 登录
+#### 2. Login
 
 ```bash
 curl -X POST http://localhost:8080/api/auth/login \
@@ -559,7 +563,7 @@ curl -X POST http://localhost:8080/api/auth/login \
   -d '{"username": "admin", "password": "your_secure_password"}'
 ```
 
-**响应：**
+**Response:**
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIs...",
@@ -573,118 +577,118 @@ curl -X POST http://localhost:8080/api/auth/login \
 }
 ```
 
-#### 3. 使用 Token 访问受保护接口
+#### 3. Accessing Protected Endpoints
 
 ```bash
-# Bearer Token（推荐）
+# Bearer Token (recommended)
 curl -H "Authorization: Bearer <token>" http://localhost:8080/api/songs
 
-# 或 Basic Auth
+# Or Basic Auth
 curl -u admin:your_secure_password http://localhost:8080/api/songs
 ```
 
 ---
 
-### 音频流接口
+### Audio Streaming
 
-#### 播放音频（支持音质选择 + 管道流式转码）
+#### Stream Audio (Quality Selection + Pipe Streaming Transcode)
 
 ```bash
-# 播放原始音质（默认，支持 Range 请求）
+# Play original quality (default, supports Range requests)
 curl http://localhost:8080/api/stream/1 > song.mp3
 
-# 选择高品质（320kbps）
+# Select high quality (320kbps)
 curl "http://localhost:8080/api/stream/1?quality=high" > song_high.mp3
 
-# 音质选项：low(128k) / medium(192k) / high(320k) / lossless / original
+# Quality options: low(128k) / medium(192k) / high(320k) / lossless / original
 
-# 支持 Range 请求（原始文件或已缓存文件）
+# Range requests (for original or cached files)
 curl -H "Range: bytes=0-1023" "http://localhost:8080/api/stream/1?quality=high"
 ```
 
-**流式转码说明：**
-- 原始文件 / 已缓存文件 → `ServeFile` 响应（支持 Range/ETag/断点续传）
-- 需实时转码且不缓存 → FFmpeg 管道流式输出（`Transfer-Encoding: chunked`，边转边播，无需等待完整文件）
-- 缓存策略由 `transcode.cache_strategy` 控制：`none`（全走管道流）、`all`（全缓存）、`smart`（播放超过阈值后缓存）
+**Streaming Transcode Details:**
+- Original / cached files → `ServeFile` response (supports Range/ETag/resume)
+- Real-time transcode without cache → FFmpeg pipe streaming (`Transfer-Encoding: chunked`, play while encoding)
+- Cache strategy controlled by `transcode.cache_strategy`: `none` (all piped), `all` (cache everything), `smart` (cache after play count threshold)
 
-### Subsonic API 兼容接口
+### Subsonic API Endpoints
 
-项目实现了 Subsonic API v1.16.1 兼容层，挂载在 `/rest/` 路径下，可直接使用 Ultrasonic、Symfonium、DSub 等客户端连接。
+The project implements a Subsonic API v1.16.1 compatibility layer, mounted at `/rest/`. Connect directly using Ultrasonic, Symfonium, DSub, and other clients.
 
-#### 启用方式
+#### Enabling
 
-在 `config.toml` 中启用：
+In `config.toml`:
 
 ```toml
 [subsonic]
 enabled = true
 ```
 
-#### 客户端连接配置
+#### Client Connection Settings
 
-| 配置项 | 值 |
-|--------|-----|
-| 服务器地址 | `http://your-server:8080` |
-| 用户名 | 系统中创建的用户名（通过 `/api/setup` 或环境变量创建） |
-| 密码 | 用户密码 |
-| 认证模式 | 明文密码 / Token 认证均支持 |
+| Setting | Value |
+|---------|-------|
+| Server URL | `http://your-server:8080` |
+| Username | A user created in the system (via `/api/setup` or environment variable) |
+| Password | User password |
+| Auth Mode | Plaintext password / Token auth both supported |
 
-#### 支持的端点
+#### Supported Endpoints
 
-| 分类 | 端点 | 描述 |
-|------|------|------|
-| System | `/rest/ping` | 心跳检测 |
-| System | `/rest/getLicense` | 许可证信息 |
-| Browsing | `/rest/getMusicFolders` | 获取音乐目录 |
-| Browsing | `/rest/getIndexes` | 按字母索引艺术家 |
-| Browsing | `/rest/getArtists` | 获取所有艺术家（ID3） |
-| Browsing | `/rest/getArtist?id=1` | 获取艺术家及其专辑 |
-| Browsing | `/rest/getAlbum?id=1` | 获取专辑及其歌曲 |
-| Browsing | `/rest/getSong?id=1` | 获取单首歌曲信息 |
-| Browsing | `/rest/getRandomSongs?size=10` | 随机歌曲 |
-| Media | `/rest/stream?id=1` | 流式播放（支持 `maxBitRate`） |
-| Media | `/rest/download?id=1` | 下载原始文件 |
-| Media | `/rest/getCoverArt?id=1` | 获取封面图 |
-| Search | `/rest/search3?query=keyword` | 搜索歌曲/专辑/艺术家 |
-| Annotation | `/rest/scrobble?id=1` | 记录播放历史 |
-| Library | `/rest/getScanStatus` | 获取扫描状态 |
-| Library | `/rest/startScan` | 触发扫描 |
+| Category | Endpoint | Description |
+|----------|----------|-------------|
+| System | `/rest/ping` | Heartbeat |
+| System | `/rest/getLicense` | License info |
+| Browsing | `/rest/getMusicFolders` | Get music directories |
+| Browsing | `/rest/getIndexes` | Artist index by letter |
+| Browsing | `/rest/getArtists` | Get all artists (ID3) |
+| Browsing | `/rest/getArtist?id=1` | Get artist and their albums |
+| Browsing | `/rest/getAlbum?id=1` | Get album and its songs |
+| Browsing | `/rest/getSong?id=1` | Get single song info |
+| Browsing | `/rest/getRandomSongs?size=10` | Random songs |
+| Media | `/rest/stream?id=1` | Stream playback (supports `maxBitRate`) |
+| Media | `/rest/download?id=1` | Download original file |
+| Media | `/rest/getCoverArt?id=1` | Get cover art |
+| Search | `/rest/search3?query=keyword` | Search songs/albums/artists |
+| Annotation | `/rest/scrobble?id=1` | Record play history |
+| Library | `/rest/getScanStatus` | Get scan status |
+| Library | `/rest/startScan` | Trigger scan |
 
-所有端点同时支持 `.view` 后缀（如 `/rest/ping.view`）。
+All endpoints also support the `.view` suffix (e.g., `/rest/ping.view`).
 
-#### 认证方式
+#### Authentication Methods
 
-支持以下三种 Subsonic 标准认证方式：
+Three standard Subsonic authentication methods are supported:
 
-**1. 明文密码认证：**
+**1. Plaintext Password:**
 ```
 /rest/ping?u=admin&p=your-password&v=1.16.1&c=myapp
 ```
 
-**2. Hex 编码密码认证：**
+**2. Hex-Encoded Password:**
 ```
 /rest/ping?u=admin&p=enc:796f75722d70617373776f7264&v=1.16.1&c=myapp
 ```
 
-**3. Token 认证（推荐）：**
+**3. Token Authentication (Recommended):**
 ```
 /rest/ping?u=admin&t=md5-token&s=random-salt&v=1.16.1&c=myapp
 ```
 
-> Token 认证的工作原理：客户端使用 `MD5(密码 + salt)` 生成 token，服务端用加密存储的密码验证。首次使用明文方式登录后，系统会自动为该用户启用 Token 认证支持。
+> Token auth works by having the client generate a token using `MD5(password + salt)`. The server verifies against the encrypted stored password. After the first plaintext login, the system automatically enables Token auth support for that user.
 
-#### 响应格式
+#### Response Format
 
-默认返回 XML，添加 `f=json` 参数切换为 JSON：
+Default is XML. Add `f=json` parameter to switch to JSON:
 ```bash
 curl "http://localhost:8080/rest/ping?u=admin&p=your-password&v=1.16.1&c=curl&f=json"
 ```
 
 ---
 
-## ⚙️ 配置说明
+## ⚙️ Configuration
 
-### 配置文件（config.toml）
+### Configuration File (config.toml)
 
 ```toml
 [server]
@@ -692,168 +696,181 @@ host = "0.0.0.0"
 port = 8080
 
 [scan]
-roots = ["/music"]              # 音乐根目录
+roots = ["/music"]              # Music root directories
 mode = "manual"                 # manual / scheduled / watch
-interval_hours = 24             # 定时扫描间隔
+interval_hours = 24             # Scheduled scan interval
 
 [database]
-path = "./data/db.sqlite"       # 数据库路径
+path = "./data/db.sqlite"       # Database path
 
 [covers]
-cache_path = "./covers"         # 封面缓存目录
-max_dimension = 1000            # 原图最大边长（像素）
-quality = 85                    # 缩略图编码质量
-cache_size_mb = 100             # 缩略图内存缓存大小（MB）
+cache_path = "./covers"         # Cover art cache directory
+max_dimension = 1000            # Max dimension for original images (px)
+quality = 85                    # Thumbnail encoding quality
+cache_size_mb = 100             # Thumbnail in-memory cache (MB)
 
 [recommend]
-job_interval_hours = 6          # 推荐任务间隔
-play_threshold = 10             # 触发推荐的播放次数
-max_results = 50                # 推荐结果数量
+job_interval_hours = 6          # Recommendation job interval
+play_threshold = 10             # Play count threshold for recommendations
+max_results = 50                # Max recommendation results
 
 [transcode]
-enabled = true                  # 启用转码功能
-cache_strategy = "smart"        # 缓存策略：none/all/smart
-cache_threshold = 10            # 智能缓存阈值（播放次数）
-max_concurrent_transcodes = 2   # 最大并发转码数
+enabled = true                  # Enable transcoding
+cache_strategy = "smart"        # Cache strategy: none/all/smart
+cache_threshold = 10            # Smart cache threshold (play count)
+max_concurrent_transcodes = 2   # Max concurrent transcodes
 
 [maintenance]
-enabled = true                  # 启用自动数据库维护
-interval_hours = 24             # 维护任务执行间隔（小时）
-history_retention_days = 90     # 播放历史保留天数
-recommendation_retention_days = 30  # 推荐记录保留天数
-enable_vacuum = true            # 启用碎片清理
-vacuum_threshold = 30.0         # VACUUM 触发阈值（碎片率%）
+enabled = true                  # Enable automatic DB maintenance
+interval_hours = 24             # Maintenance job interval (hours)
+history_retention_days = 90     # Play history retention (days)
+recommendation_retention_days = 30  # Recommendation cache retention (days)
+enable_vacuum = true            # Enable defragmentation
+vacuum_threshold = 30.0         # VACUUM trigger threshold (fragmentation %)
 
 [subsonic]
-enabled = true                  # 启用 Subsonic API 兼容层
+enabled = true                  # Enable Subsonic API compatibility
 
 [web]
-enabled = true                  # 启用前端静态文件托管
-path = "./web"                  # 前端构建产物目录
+enabled = true                  # Enable frontend static file hosting
+path = "./web"                  # Frontend build output directory
 ```
 
-### 重点配置项
+> For the complete configuration reference with detailed comments, see [`config.toml.example.en`](config.toml.example.en).
 
-以下配置项对服务的正常运行和安全性至关重要，请在首次部署前仔细确认：
+### Key Configuration Items
 
-#### 1. 音乐扫描根目录 `scan.roots`
+The following settings are critical for proper operation and security. Review them carefully before your first deployment:
+
+#### 1. Music Scan Root Directories `scan.roots`
 
 ```toml
 [scan]
 roots = ["/music"]
 ```
 
-- 指定服务需要扫描的音乐文件目录，支持配置**多个目录**
-- Docker 部署时，需将宿主机的音乐目录挂载到容器内，并在此处填写**容器内路径**
-- 本地开发时，填写宿主机上的实际绝对路径
+- Specify directories for the service to scan, supports **multiple directories**
+- For Docker deployment, mount host music directories into the container and use the **container path** here
+- For local development, use the actual absolute path on the host
 
 ```toml
-# 多目录示例
+# Multiple directories example
 roots = ["/music/chinese", "/music/english", "/music/classical"]
 ```
 
-#### 2. JWT 密钥 `security.jwt_secret`
+#### 2. JWT Secret `security.jwt_secret`
 
 ```toml
 [security]
 jwt_secret = "your-random-hex-secret-here"
 ```
 
-- 用于签发和验证 Web 前端 / REST API 的登录 Token
-- **不配置**（默认）：每次服务重启后随机生成密钥，所有用户需重新登录
-- **配置固定值**：服务重启后 Token 仍然有效，用户无感知
+- Used to sign and verify Web frontend / REST API login tokens
+- **Not configured** (default): A random key is generated on each restart; all users must re-login
+- **Fixed value**: Tokens remain valid across restarts, transparent to users
 
-生成推荐值：
+Generate a recommended value:
 
 ```bash
 openssl rand -hex 32
 ```
 
-> 开发阶段可以留空（方便调试），正式部署前**必须**配置固定值。密钥的安全性取决于其长度和保密性，而非是否频繁更换。
+> During development, you can leave it empty (easier debugging). For production, you **must** set a fixed value. Security depends on length and secrecy, not frequent rotation.
 
-#### 3. Subsonic 密码加密密钥 `security.encryption_key`
+#### 3. Subsonic Password Encryption Key `security.encryption_key`
 
 ```toml
 [security]
 encryption_key = "your-random-hex-key-here"
 ```
 
-- 用于加密存储 Subsonic Token 认证所需的明文密码
-- 默认值为公开的占位字符串，**安全性等同于未加密**
-- 配置自定义值后，即使数据库泄露，攻击者也需要同时获取此密钥才能解密
+- Used to encrypt stored passwords needed for Subsonic Token authentication
+- Default value is a public placeholder string — **security is equivalent to unencrypted**
+- With a custom value, even if the database leaks, an attacker also needs this key to decrypt
 
-生成推荐值：
+Generate a recommended value:
 
 ```bash
 openssl rand -hex 32
 ```
 
-> **注意**：一旦确定此密钥并产生用户数据后，不可随意更改。更改后所有已加密的 Subsonic 密码将无法解密，受影响用户需要重新修改密码。
+> **Warning**: Once set and user data exists, do not change this key arbitrarily. Changing it will make all encrypted Subsonic passwords unrecoverable; affected users will need to reset their passwords.
 
-### 环境变量（Docker 优先）
+### Environment Variables (Docker Priority)
 
 ```bash
-# 服务配置
+# Service config
 MUSIC_SERVER_PORT=8080
 MUSIC_SCAN_ROOTS=/music
 MUSIC_DATABASE_PATH=/data/db.sqlite
 MUSIC_COVERS_CACHE_PATH=/covers
 
-# 初始管理员（首次启动时使用）
+# Initial admin (used on first launch)
 MUSIC_ADMIN_USER=admin
 MUSIC_ADMIN_PASSWORD=your_secure_password
 ```
 
-## 🐛 故障排查
+## 🐛 Troubleshooting
 
-### 问题：扫描任务没有响应
+### Problem: Scan job not responding
 
-**解决方案：**
-1. 检查音乐目录权限
-2. 查看日志：`docker-compose logs -f`
-3. 手动触发扫描：`POST /api/scan`
+**Solution:**
+1. Check music directory permissions
+2. Check logs: `docker-compose logs -f`
+3. Manually trigger scan: `POST /api/scan`
 
-### 问题：音频无法播放
+### Problem: Audio won't play
 
-**解决方案：**
-1. 确认 Range 请求支持
-2. 检查文件路径是否正确
-3. 验证文件格式是否支持
+**Solution:**
+1. Verify Range request support
+2. Check file path is correct
+3. Verify file format is supported
 
-### 问题：推荐结果为空
+### Problem: Recommendations are empty
 
-**解决方案：**
-1. 确保有足够的播放历史（默认需要 10 次）
-2. 检查推荐任务是否运行：查看日志
-3. 手动触发推荐计算（需实现触发接口）
+**Solution:**
+1. Ensure enough play history exists (default requires 10 plays)
+2. Check if the recommendation job is running: check logs
+3. Manually trigger recommendation calculation
 
-## 🤝 贡献指南
+## 🤝 Contributing
 
-欢迎提交 Issue 和 Pull Request！
+Issues and Pull Requests are welcome!
 
-1. Fork 本项目
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m '添加某某功能'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
+1. Fork this project
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📄 许可证
+## 📄 License
 
-本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
-## 🙏 致谢
+## 🙏 Acknowledgments
 
-- [Tokio](https://tokio.rs/) - 异步运行时
-- [Axum](https://github.com/tokio-rs/axum) - Web 框架
-- [TagLib](https://taglib.org/) - 音频元数据库
-- [SQLite](https://www.sqlite.org/) - 嵌入式数据库
+- [Tokio](https://tokio.rs/) — Async runtime
+- [Axum](https://github.com/tokio-rs/axum) — Web framework
+- [TagLib](https://taglib.org/) — Audio metadata library
+- [SQLite](https://www.sqlite.org/) — Embedded database
 
-## 📧 联系方式
+## 💖 Sponsor & Support
 
-- 项目主页：https://github.com/qwex888/zhiyin
-- 问题反馈：https://github.com/qwex888/zhiyin/issues
+Zhiyin is an open-source project, completely free to use. If you find it helpful, consider supporting development:
+
+- ⭐ Star this project
+- 🐛 Submit an Issue or PR
+- ☕ Buy the author a coffee
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/qwex888/zhiyin-web/main/docs/donate/alipay.jpg" alt="Alipay" width="200" />
+</div>
+
+## 📧 Contact
+
+- Project Home: https://github.com/qwex888/zhiyin
+- Issue Tracker: https://github.com/qwex888/zhiyin/issues
 
 ---
 
 **Made with ❤️ and Rust**
-

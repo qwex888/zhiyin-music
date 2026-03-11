@@ -16,6 +16,11 @@
 host = "0.0.0.0"
 port = 8080
 
+# 音频流播放后释放文件页缓存（Linux posix_fadvise）
+# 大部分客户端会在本地缓存歌曲，服务端页缓存命中率低
+# 小内存主机（≤2GB RAM）建议开启，可显著降低内存占用
+drop_cache_after_stream = false
+
 [scan]
 # 音乐扫描根目录（支持多个路径）
 # 
@@ -50,7 +55,8 @@ min_file_size = 1024
 #
 path = "/data/db.sqlite"
 
-# 连接池大小（NAS 低内存场景建议 2~4）
+# 连接池大小
+# 低内存主机（≤2GB RAM）建议设为 2，可减少 SQLite 内存开销
 pool_size = 4
 
 [covers]
@@ -65,12 +71,14 @@ pool_size = 4
 cache_path = "/covers"
 
 # 原图最大边长（像素），入库时超过此值的封面会等比缩放
+# 低内存主机建议设为 800，减小封面尺寸以降低内存和存储开销
 max_dimension = 1000
 
 # 缩略图编码质量（JPEG 压缩质量，0-100）
 quality = 85
 
-# 封面内存缓存（MB），NAS 低内存场景建议 10~20，0 表示禁用
+# 封面内存缓存（MB），0 表示禁用
+# 低内存主机（≤2GB RAM）建议设为 5~10
 cache_size_mb = 20
 
 # 封面提取策略优先级：
@@ -122,6 +130,7 @@ cache_strategy = "smart"
 cache_threshold = 10
 
 # 最大并发转码任务数
+# 低内存主机建议设为 1，减少并发转码的内存占用
 max_concurrent_transcodes = 2
 
 [maintenance]
@@ -214,4 +223,17 @@ format = "pretty"
 # 模块日志级别配置（可选）
 # 例如: ["zhiyin=debug", "axum=info", "tower_http=debug"]
 modules = []
+
+# ============================================================
+# 低内存主机快速参考（≤2GB RAM）
+# ============================================================
+# 如果在小内存设备（NAS、树莓派等）上运行，建议调整以下配置：
+#
+#   database.pool_size = 2
+#   covers.cache_size_mb = 5
+#   covers.max_dimension = 800
+#   transcode.max_concurrent_transcodes = 1
+#
+# 同时在 docker-compose.yml 中设置 mem_limit: 256m（或 192m）
+# 限制容器内存上限，内核会自动回收文件页缓存，不会 OOM-kill 进程。
 

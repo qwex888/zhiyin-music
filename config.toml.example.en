@@ -1,0 +1,241 @@
+# Zhiyin Configuration File Example
+# 
+# Usage:
+#   1. Copy this file as config.toml: cp config.toml.example.en config.toml
+#   2. Modify settings according to your environment (local dev or Docker)
+#   3. config.toml will not be committed to Git (added to .gitignore)
+#
+# Hot Reload:
+#   - Local dev: requires service restart after changes
+#   - Docker: run docker-compose kill -s SIGHUP zhiyin
+
+[server]
+# Listen address
+# Docker deployment must use "0.0.0.0" (required for container networking)
+# Local development: use "127.0.0.1" (localhost only, more secure)
+host = "0.0.0.0"
+port = 8080
+
+# Release page cache after audio streaming (Linux posix_fadvise)
+# Most clients cache songs locally, so server page cache hit rate is low
+# Recommended for low-memory hosts (<=2GB RAM) to significantly reduce memory usage
+drop_cache_after_stream = false
+
+[scan]
+# Music scan root directories (supports multiple paths)
+# 
+# Local development example:
+#   roots = ["/Users/yourname/Music", "/Volumes/ExternalDrive/Music"]
+#
+# Docker deployment example (matches mounts in docker-compose.yml):
+#   roots = ["/music"]
+#
+roots = ["/music"]
+
+# Scan mode: manual / scheduled / watch (file system monitoring)
+mode = "manual"
+
+# Scheduled scan interval (hours), only effective in "scheduled" mode
+interval_hours = 24
+
+# Skip audio files that are too small (empty files, corrupted files, etc.)
+skip_small_files = true
+
+# Minimum file size (bytes), files below this threshold will be skipped (default 1024 = 1KB)
+min_file_size = 1024
+
+[database]
+# Database file path
+#
+# Local development example:
+#   path = "./data/db.sqlite"
+#
+# Docker deployment example:
+#   path = "/data/db.sqlite"
+#
+path = "/data/db.sqlite"
+
+# Connection pool size
+# For low-memory hosts (<=2GB RAM), set to 2 to reduce SQLite memory overhead
+pool_size = 4
+
+[covers]
+# Cover art cache directory
+#
+# Local development example:
+#   cache_path = "./covers"
+#
+# Docker deployment example:
+#   cache_path = "/covers"
+#
+cache_path = "/covers"
+
+# Maximum dimension for original images (pixels), covers exceeding this will be proportionally scaled on import
+# For low-memory hosts, set to 800 to reduce cover size and lower memory/storage overhead
+max_dimension = 1000
+
+# Thumbnail encoding quality (JPEG compression quality, 0-100)
+quality = 85
+
+# Cover art in-memory cache (MB), 0 to disable
+# For low-memory hosts (<=2GB RAM), set to 5~10
+cache_size_mb = 20
+
+# Cover extraction priority:
+# 1. embedded: cover art embedded in the audio file
+# 2. same_name: image file with the same name as the audio file
+# 3. standard_names: cover files using standard file names
+
+# Standard cover file names (sorted by priority, case-insensitive)
+standard_names = [
+    "cover",
+    "folder",
+    "front",
+    "album",
+    "albumart",
+    "albumartsmall"
+]
+
+# Supported image format extensions
+image_extensions = ["jpg", "jpeg", "png", "webp"]
+
+[recommend]
+# Recommendation job interval (hours)
+job_interval_hours = 24
+
+# Play count threshold to trigger recommendation calculation
+play_threshold = 10
+
+# Maximum number of recommendation results
+max_results = 50
+
+[transcode]
+# Enable transcoding
+enabled = true
+
+# Transcode cache directory
+#
+# Local development example:
+#   cache_path = "./data/transcoded"
+#
+# Docker deployment example:
+#   cache_path = "/data/transcoded"
+#
+cache_path = "/data/transcoded"
+
+# Cache strategy: none (no cache) / all (cache everything) / smart (intelligent caching)
+cache_strategy = "smart"
+
+# Smart cache threshold (songs played more than this count will be pre-transcoded)
+cache_threshold = 10
+
+# Maximum concurrent transcode tasks
+# For low-memory hosts, set to 1 to reduce concurrent transcoding memory usage
+max_concurrent_transcodes = 2
+
+[maintenance]
+# Enable automatic database maintenance
+enabled = true
+
+# Maintenance job interval (hours)
+interval_hours = 24
+
+# Play history retention (days), 0 means never delete
+history_retention_days = 90
+
+# Recommendation cache retention (days), 0 means never delete
+recommendation_retention_days = 30
+
+# Enable incremental VACUUM (defragmentation)
+enable_vacuum = true
+
+# VACUUM trigger threshold (fragmentation percentage, 0-100)
+# VACUUM is only executed when database fragmentation exceeds this value
+vacuum_threshold = 30.0
+
+# Similarity weight configuration
+[recommend.weights]
+artist = 0.3      # Artist similarity weight
+album = 0.2       # Album similarity weight
+genre = 0.3       # Genre similarity weight
+year = 0.1        # Year similarity weight
+play_count = 0.1  # Play count weight
+
+[jobs]
+# Background job configuration
+
+# Job retention (days for historical job records)
+retention_days = 30
+
+# Job cleanup interval (hours)
+cleanup_interval_hours = 24
+
+[subsonic]
+# Enable Subsonic API compatibility layer (/rest/ path)
+enabled = true
+
+# Create admin user on first start via environment variables or /api/setup
+
+[web]
+# Enable Web frontend static file serving
+enabled = true
+
+# Frontend build output directory
+#
+# Local development example:
+#   path = "./web"
+#
+# Docker deployment example:
+#   path = "/app/web"
+#
+path = "/app/web"
+
+[security]
+# JWT secret key (strongly recommended to set a fixed value,
+# otherwise all users must re-login after every service restart)
+# Generate with: openssl rand -hex 32
+# jwt_secret = "your-random-hex-secret-here"
+
+# Token validity period (hours), default 168 (7 days)
+token_expiry_hours = 168
+
+# Subsonic password encryption key (used to encrypt stored passwords for Subsonic Token auth)
+# Strongly recommended to change to a custom value!
+encryption_key = "zhiyin-default-key-CHANGE-ME"
+
+# CORS allowed origins (empty list or ["*"] allows all origins)
+# For production, configure with the actual frontend address
+# cors_origins = ["https://music.example.com", "http://localhost:3000"]
+cors_origins = []
+
+# Login rate limiting: max attempts within the window (0 means unlimited)
+login_rate_limit = 10
+
+# Login rate limiting window (seconds), default 300 (5 minutes)
+login_rate_window_secs = 300
+
+[logging]
+# Log level: trace / debug / info / warn / error
+level = "info"
+
+# Log format: json / pretty
+format = "pretty"
+
+# Module-level log configuration (optional)
+# Example: ["zhiyin=debug", "axum=info", "tower_http=debug"]
+modules = []
+
+# ============================================================
+# Low-Memory Host Quick Reference (<=2GB RAM)
+# ============================================================
+# If running on low-memory devices (NAS, Raspberry Pi, etc.),
+# consider adjusting the following settings:
+#
+#   database.pool_size = 2
+#   covers.cache_size_mb = 5
+#   covers.max_dimension = 800
+#   transcode.max_concurrent_transcodes = 1
+#
+# Also set mem_limit: 256m (or 192m) in docker-compose.yml
+# to cap container memory. The kernel will automatically reclaim
+# page cache without OOM-killing the process.

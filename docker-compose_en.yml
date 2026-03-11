@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  zhiyin:
+    image: qwex333/zhiyin:latest
+    container_name: zhiyin
+    
+    ports:
+      - "8080:8080"
+    
+    volumes:
+      # Music directory (read-only) - change to your actual path
+      # For additional paths, mount them here first, then add the docker path in config.toml
+      # Example: - /vol1/1000/Music:/music:ro
+      - ./music:/music:ro
+      
+      # Database directory (persistent)
+      - ./data:/data
+
+      # Config file
+      # First time: cp config.toml.example config.toml
+      # Then edit config.toml
+      - ./config.toml:/app/config.toml:ro
+      
+      # Cover cache directory (optional, for manual cover management)
+      # - ./covers:/covers
+      
+      
+      # Web frontend (optional, mount frontend build output to container)
+      # - ./web:/app/web:ro
+    
+    environment:
+      # Log level
+      - RUST_LOG=info
+      
+      # Initial admin (only takes effect on first startup, can be removed after creation)
+      # - MUSIC_ADMIN_USER=admin
+      # - MUSIC_ADMIN_PASSWORD=your_secure_password
+      
+      # Note: other settings should be configured in config.toml
+
+    # Memory limit (including file page cache), prevents excessive memory usage on low-memory hosts
+    # 256m works for most cases; use 192m for very low memory hosts, 512m for better cache performance
+    # mem_limit: 256m
+    
+    restart: unless-stopped
+    
+    # Health check (curl/wget not installed in image, uses built-in binary HTTP self-check)
+    # If wget is available: test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/health || exit 1"]
+    healthcheck:
+      test: ["CMD", "zhiyin", "--health-check"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    
+    networks:
+      - music-network
+
+networks:
+  music-network:
+    driver: bridge
+
+# Usage:
+# 1. Copy config: cp config.toml.example config.toml
+# 2. Edit config.toml:
+#    - Music scan directories (roots)
+#    - Database path (path)
+#    - Other optional settings
+# 3. Update music directory path in volumes (change ./music to your actual path)
+# 4. Start: docker-compose up -d
+# 5. View logs: docker-compose logs -f
+# 6. Stop: docker-compose down
+# 7. Access API: http://localhost:8080/api/songs
+# 8. Access docs: http://localhost:8080/swagger-ui
+#
+# Hot reload config (no restart needed):
+#   docker-compose kill -s SIGHUP zhiyin
+
