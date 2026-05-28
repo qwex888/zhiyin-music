@@ -2,7 +2,7 @@
   <img src="assets/logo.svg" width="128" alt="Zhiyin Logo" />
 </p>
 
-<h1 align="center">Zhiyin</h1>
+<h1 align="center">Zhiyin Music 知音音乐</h1>
 
 <p align="center">A Rust-based remote NAS music library + Web player system</p>
 
@@ -16,7 +16,7 @@
 
 ## 📖 Overview
 
-Zhiyin is a music streaming service designed for NAS environments, offering:
+Zhiyin Music is a music streaming service designed for NAS environments, offering:
 
 - 🎼 **Large-scale Music Library**: Easily manage tens of thousands of tracks
 - 🚀 **High Performance**: Rust + SQLite + async architecture, memory optimized to ~30-50MB

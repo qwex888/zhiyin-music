@@ -2,7 +2,7 @@
   <img src="assets/logo.svg" width="128" alt="Zhiyin Logo" />
 </p>
 
-<h1 align="center">Zhiyin 知音</h1>
+<h1 align="center">Zhiyin Music 知音音乐</h1>
 
 <p align="center">基于 Rust 的远程 NAS 音乐库 + Web 播放器系统</p>
 
@@ -16,7 +16,7 @@
 
 ## 📖 项目简介
 
-Zhiyin 知音 是一个专为 NAS 场景设计的音乐流媒体服务，旨在提供：
+Zhiyin Music 知音音乐 是一个专为 NAS 场景设计的音乐流媒体服务，旨在提供：
 
 - 🎼 **大规模音乐库支持**：轻松管理数万首音乐
 - 🚀 **高性能**：Rust + SQLite + 异步架构，内存优化至 ~30-50MB
