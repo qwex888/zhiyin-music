@@ -27,22 +27,46 @@ Zhiyin Music is a music streaming service designed for NAS environments, offerin
 - 📡 **Subsonic API Compatible**: Works with Symfonium, DSub, Ultrasonic, and other popular clients
 - 🔐 **User Authentication**: JWT + Basic Auth + bcrypt with role-based access control
 - 🖥️ **Frontend Hosting**: Optional built-in Web frontend service with SPA support
+- 🎯 **Scraping** — automatically fetch metadata and cover art from multiple music platforms
+- ☁️ **STRM cloud links** — play music from Aliyun Drive, WebDAV, and other cloud sources via `.strm` files
 
 ## ✨ Features
 
-### 1. Music Library Management
+### Library Management
 - ✅ Multiple music root directories
 - ✅ Incremental scanning (based on mtime/size/hash)
 - ✅ Real-time file watching (optional)
-- ✅ Supported formats: MP3, FLAC, WAV, M4A, OGG, OPUS, APE
+- ✅ Formats: MP3, FLAC, WAV, M4A, OGG, OPUS, APE
+- ✅ `.strm` cloud link files (Aliyun Drive, WebDAV, Alist, etc.)
 
-### 2. Metadata Parsing
+### Metadata Parsing
 - ✅ Audio metadata parsing with TagLib
 - ✅ Automatic extraction of embedded cover art
 - ✅ External cover file support (cover.jpg, folder.jpg)
 - ✅ Cover deduplication via hash to save storage
 
-### 3. Audio Playback
+### STRM Cloud Sources
+- ✅ Read remote URLs from `.strm` files (Aliyun Drive, WebDAV, Alist, etc.)
+- ✅ `source_type` field distinguishes local songs from cloud songs
+- ✅ Proxy mode — server-side forwarding via curl with forced IPv4, compatible with China CDNs
+- ✅ Redirect mode — 307 redirect for client-direct access, saves server bandwidth
+- ✅ Smart metadata inference from filename and directory structure (artist/album/track)
+- ✅ Optional HTTP HEAD probe for remote file size and audio properties
+- ✅ Full feature parity with local songs (covers, lyrics, play history, recommendations)
+- ✅ Auto-scrape compatible — intelligently parses "Artist - Title" filename patterns
+
+### Scraping
+- ✅ Supported platforms: NetEase, QQ Music, Kugou, Kuwo, Migu
+- ✅ Auto mode — apply the best match automatically when confidence exceeds a threshold
+- ✅ Manual review mode — low-confidence results queued for human confirmation
+- ✅ Cover art downloaded and embedded (MP3/FLAC/M4A/OGG, etc.)
+- ✅ Robust cover writing — format detection by magic bytes, not file extension; handles mislabeled files (e.g. MP3 named as .flac)
+- ✅ Cover bytes persisted to cover-store and `cover_id` updated in DB immediately after scraping — even if file embedding fails, the cover is still shown
+- ✅ Lyrics fetched and written to embedded tags or sidecar `.lrc` files
+- ✅ STRM songs — no tag embedding; saves external cover and `.lrc` lyrics file only
+- ✅ Full scrape session logs and operation history
+
+### Playback
 - ✅ HTTP Range request support (seamless seeking)
 - ✅ **Multi-tier quality selection (128k/192k/320k/lossless)**
 - ✅ **Smart transcode caching (based on play count)**
@@ -50,7 +74,7 @@ Zhiyin Music is a music streaming service designed for NAS environments, offerin
 - ✅ Original format playback (no transcoding)
 - ✅ Play history tracking
 
-### 3.5 Subsonic API Compatibility
+### Subsonic API Compatibility
 - ✅ **Subsonic API v1.16.1 compatibility layer** (mounted at `/rest/`, 40+ endpoints)
 - ✅ Works with Ultrasonic, Symfonium, DSub, and other mainstream clients
 - ✅ Multiple auth methods (plaintext password / hex-encoded / token auth)
@@ -65,7 +89,7 @@ Zhiyin Music is a music streaming service designed for NAS environments, offerin
 - ⬜ **Stub endpoints** (routes registered, returning empty responses for client compatibility):
   - Playlists, favorites/ratings, bookmarks, lyrics, similar recommendations, radio/podcasts, etc.
 
-### 4. User Authentication & Permissions
+### User Authentication & Permissions
 - ✅ User system (SQLite `users` table, bcrypt password hashing)
 - ✅ JWT Token authentication (REST API)
 - ✅ Basic Auth authentication (REST API)
@@ -74,19 +98,19 @@ Zhiyin Music is a music streaming service designed for NAS environments, offerin
 - ✅ User management API (create/update/delete/reset password)
 - ✅ Subsonic API uses unified database user authentication
 
-### 5. Web Frontend Hosting (Optional)
+### Web Frontend Hosting (Optional)
 - ✅ Built-in HTTP static file server
 - ✅ SPA route fallback (auto fallback to `index.html`)
 - ✅ Mount via Docker volume or place frontend build output directly
 - ✅ Swap in any frontend framework build output at any time
 
-### 6. Personalized Recommendations
+### Personalized Recommendations
 - ✅ Frequently played recommendations
 - ✅ Recently listened recommendations
 - ✅ Similarity-based recommendations (artist/album/directory)
 - ✅ Async background computation, non-blocking API
 
-### 7. Docker Deployment
+### Docker Deployment
 - ✅ Multi-stage build, small image size
 - ✅ Supports x86_64 and ARM64
 - ✅ Health checks and auto-restart
@@ -699,6 +723,9 @@ port = 8080
 roots = ["/music"]              # Music root directories
 mode = "manual"                 # manual / scheduled / watch
 interval_hours = 24             # Scheduled scan interval
+scan_strm = true          # scan .strm cloud link files
+strm_mode = "proxy"       # proxy (server-side forward) / redirect (307 to client)
+strm_probe_remote = false # probe remote URL for file size/audio info
 
 [database]
 path = "./data/db.sqlite"       # Database path
