@@ -881,20 +881,20 @@ MUSIC_ADMIN_PASSWORD=your_secure_password
 
 ## 💖 赞助与支持
 
-Zhiyin 知音是一个开源项目，完全免费使用。如果它对你有帮助，可以通过以下方式支持开发：
+Zhiyin Music 知音是一个开源项目，完全免费使用。如果它对你有帮助，可以通过以下方式支持开发：
 
 - ⭐ 给项目一个 Star
 - 🐛 提交 Issue 或 PR
 - ☕ 请作者喝杯咖啡
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/qwex888/zhiyin-web/main/docs/donate/alipay.jpg" alt="支付宝" width="200" />
+  <img src="https://raw.githubusercontent.com/qwex888/zhiyin-music-web/main/docs/donate/alipay.jpg" alt="支付宝" width="200" />
 </div>
 
 ## 📧 联系方式
 
-- 项目主页：https://github.com/qwex888/zhiyin
-- 问题反馈：https://github.com/qwex888/zhiyin/issues
+- 项目主页：https://github.com/qwex888/zhiyin-music
+- 问题反馈：https://github.com/qwex888/zhiyin-music/issues
 
 ---
 

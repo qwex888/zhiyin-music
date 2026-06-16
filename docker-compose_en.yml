@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  zhiyin:
-    image: qwex333/zhiyin:latest
-    container_name: zhiyin
+  zhiyin-music:
+    image: qwex333/zhiyin-music:latest
+    container_name: zhiyin-music
     
     ports:
       - "8080:8080"
@@ -15,12 +15,12 @@ services:
       - ./music:/music:ro
       
       # Database directory (persistent)
-      - ./data:/data
+      #- ./data:/data
 
       # Config file
       # First time: cp config.toml.example config.toml
       # Then edit config.toml
-      - ./config.toml:/app/config.toml:ro
+      #- ./config.toml:/app/config.toml:ro
       
       # Cover cache directory (optional, for manual cover management)
       # - ./covers:/covers
@@ -48,7 +48,7 @@ services:
     # Health check (curl/wget not installed in image, uses built-in binary HTTP self-check)
     # If wget is available: test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/health || exit 1"]
     healthcheck:
-      test: ["CMD", "zhiyin", "--health-check"]
+      test: ["CMD", "zhiyin-music", "--health-check"]
       interval: 30s
       timeout: 3s
       retries: 3
@@ -75,5 +75,5 @@ networks:
 # 8. Access docs: http://localhost:8080/swagger-ui
 #
 # Hot reload config (no restart needed):
-#   docker-compose kill -s SIGHUP zhiyin
+#   docker-compose kill -s SIGHUP zhiyin-music
 

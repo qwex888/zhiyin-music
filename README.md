@@ -883,20 +883,20 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 ## 💖 Sponsor & Support
 
-Zhiyin is an open-source project, completely free to use. If you find it helpful, consider supporting development:
+Zhiyin Music is an open-source project, completely free to use. If you find it helpful, consider supporting development:
 
 - ⭐ Star this project
 - 🐛 Submit an Issue or PR
 - ☕ Buy the author a coffee
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/qwex888/zhiyin-web/main/docs/donate/alipay.jpg" alt="Alipay" width="200" />
+  <img src="https://raw.githubusercontent.com/qwex888/zhiyin-music-web/main/docs/donate/alipay.jpg" alt="Alipay" width="200" />
 </div>
 
 ## 📧 Contact
 
-- Project Home: https://github.com/qwex888/zhiyin
-- Issue Tracker: https://github.com/qwex888/zhiyin/issues
+- Project Home: https://github.com/qwex888/zhiyin-music
+- Issue Tracker: https://github.com/qwex888/zhiyin-music/issues
 
 ---
 

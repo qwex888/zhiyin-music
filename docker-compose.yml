@@ -1,12 +1,9 @@
 version: '3.8'
 
 services:
-  zhiyin:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: zhiyin:latest
-    container_name: zhiyin
+  zhiyin-music:
+    image: zhiyin-music:latest
+    container_name: zhiyin-music
     
     ports:
       - "8080:8080"
@@ -16,10 +13,10 @@ services:
       - ./music:/music:ro
       
       # 数据库目录（持久化）
-      - ./data:/data
+      #- ./data:/data
       
       # 封面缓存目录(可选， 如果想手动管理封面)
-      - ./covers:/covers
+      #- ./covers:/covers
       
       
       # Web 前端已内置于镜像中（/app/web）
@@ -50,7 +47,7 @@ services:
     # 健康检查（镜像中未安装 curl/wget，使用内置二进制的 HTTP 自检）
     # 如安装了 wget 可替换为: test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/health || exit 1"]
     healthcheck:
-      test: ["CMD", "zhiyin", "--health-check"]
+      test: ["CMD", "zhiyin-music", "--health-check"]
       interval: 30s
       timeout: 3s
       retries: 3
@@ -77,5 +74,5 @@ networks:
 # 8. 访问文档: http://localhost:8080/swagger-ui
 #
 # 配置热重载（无需重启）：
-#   docker-compose kill -s SIGHUP zhiyin
+#   docker-compose kill -s SIGHUP zhiyin-music
 

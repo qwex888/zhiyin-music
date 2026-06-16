@@ -1,24 +1,24 @@
 # Zhiyin Configuration File Example
 # 
-# Usage:
-#   1. Copy this file as config.toml: cp config.toml.example.en config.toml
+# Instructions:
+#   1. Copy this file as config.toml: cp config.toml.example config.toml
 #   2. Modify settings according to your environment (local dev or Docker)
-#   3. config.toml will not be committed to Git (added to .gitignore)
+#   3. config.toml will not be committed to Git (already in .gitignore)
 #
-# Hot Reload:
-#   - Local dev: requires service restart after changes
-#   - Docker: run docker-compose kill -s SIGHUP zhiyin
+# Configuration Hot Reload:
+#   - Local dev: restart the service after changes
+#   - Docker: run docker-compose kill -s SIGHUP zhiyin-music
 
 [server]
 # Listen address
 # Docker deployment must use "0.0.0.0" (required for container networking)
-# Local development: use "127.0.0.1" (localhost only, more secure)
+# Local development recommends "127.0.0.1" (localhost only, more secure)
 host = "0.0.0.0"
 port = 8080
 
 # Release page cache after audio streaming (Linux posix_fadvise)
 # Most clients cache songs locally, so server page cache hit rate is low
-# Recommended for low-memory hosts (<=2GB RAM) to significantly reduce memory usage
+# Recommended for low-memory hosts (≤2GB RAM) to significantly reduce memory usage
 drop_cache_after_stream = false
 
 [scan]
@@ -27,22 +27,44 @@ drop_cache_after_stream = false
 # Local development example:
 #   roots = ["/Users/yourname/Music", "/Volumes/ExternalDrive/Music"]
 #
-# Docker deployment example (matches mounts in docker-compose.yml):
+# Docker deployment example (corresponds to mounts in docker-compose.yml):
 #   roots = ["/music"]
 #
 roots = ["/music"]
 
-# Scan mode: manual / scheduled / watch (file system monitoring)
+# Scan mode: manual / scheduled / watch
 mode = "manual"
 
-# Scheduled scan interval (hours), only effective in "scheduled" mode
+# Scheduled scan interval (hours), only effective in scheduled mode
 interval_hours = 24
 
-# Skip audio files that are too small (empty files, corrupted files, etc.)
+# Whether to skip very small audio files (empty files, corrupted files, etc.)
 skip_small_files = true
 
-# Minimum file size (bytes), files below this threshold will be skipped (default 1024 = 1KB)
+# Minimum file size (bytes), files below this value will be skipped (default 1024 = 1KB)
 min_file_size = 1024
+
+# ---------- STRM Cloud Drive Direct Link Support ----------
+# Whether to scan .strm files (file content is a URL pointing to remote audio)
+scan_strm = true
+
+# STRM playback mode:
+#   "proxy"    — Server-side proxy forwarding (default)
+#                Uses system curl to follow redirect chains and stream audio data to client,
+#                without exposing remote URLs; uses curl -4 to force IPv4 to avoid CDN IPv6
+#                connectivity issues, compatible with domestic CDN TLS requirements (Aliyun Drive, etc.)
+#   "redirect" — Smart redirect mode (recommended, saves bandwidth)
+#                Automatically probes IPv6 connectivity to CDN at startup, re-checks every 5 minutes:
+#                  - IPv6 reachable → 307 redirect for client direct connection, saves server bandwidth
+#                  - IPv6 unreachable → auto fallback to proxy mode, ensures uninterrupted playback
+#                Log will show current state transition info
+strm_mode = "redirect"
+
+# Whether to perform remote probing (HTTP HEAD + ffprobe) on strm URLs during scan
+# to get actual file size, duration and other attributes
+# Enabling slows down scanning but provides more complete song metadata;
+# disabling leaves attributes empty, but playback still works normally
+strm_probe_remote = false
 
 [database]
 # Database file path
@@ -56,7 +78,7 @@ min_file_size = 1024
 path = "/data/db.sqlite"
 
 # Connection pool size
-# For low-memory hosts (<=2GB RAM), set to 2 to reduce SQLite memory overhead
+# Low-memory hosts (≤2GB RAM) recommend setting to 2 to reduce SQLite memory overhead
 pool_size = 4
 
 [covers]
@@ -70,23 +92,23 @@ pool_size = 4
 #
 cache_path = "/covers"
 
-# Maximum dimension for original images (pixels), covers exceeding this will be proportionally scaled on import
-# For low-memory hosts, set to 800 to reduce cover size and lower memory/storage overhead
+# Maximum dimension of original image (pixels); covers exceeding this will be proportionally scaled
+# Low-memory hosts recommend 800 to reduce cover size and lower memory/storage overhead
 max_dimension = 1000
 
 # Thumbnail encoding quality (JPEG compression quality, 0-100)
 quality = 85
 
 # Cover art in-memory cache (MB), 0 to disable
-# For low-memory hosts (<=2GB RAM), set to 5~10
+# Low-memory hosts (≤2GB RAM) recommend 5~10
 cache_size_mb = 20
 
-# Cover extraction priority:
+# Cover extraction strategy priority:
 # 1. embedded: cover art embedded in the audio file
 # 2. same_name: image file with the same name as the audio file
-# 3. standard_names: cover files using standard file names
+# 3. standard_names: cover files using standard filenames
 
-# Standard cover file names (sorted by priority, case-insensitive)
+# Standard cover filenames (sorted by priority, case-insensitive)
 standard_names = [
     "cover",
     "folder",
@@ -100,7 +122,7 @@ standard_names = [
 image_extensions = ["jpg", "jpeg", "png", "webp"]
 
 [recommend]
-# Recommendation job interval (hours)
+# Recommendation job execution interval (hours)
 job_interval_hours = 24
 
 # Play count threshold to trigger recommendation calculation
@@ -110,7 +132,7 @@ play_threshold = 10
 max_results = 50
 
 [transcode]
-# Enable transcoding
+# Whether to enable transcoding
 enabled = true
 
 # Transcode cache directory
@@ -123,61 +145,59 @@ enabled = true
 #
 cache_path = "/data/transcoded"
 
-# Cache strategy: none (no cache) / all (cache everything) / smart (intelligent caching)
+# Cache strategy: none / all / smart
 cache_strategy = "smart"
 
-# Smart cache threshold (songs played more than this count will be pre-transcoded)
+# Smart cache threshold (songs with play count exceeding this will be pre-transcoded)
 cache_threshold = 10
 
-# Maximum concurrent transcode tasks
-# For low-memory hosts, set to 1 to reduce concurrent transcoding memory usage
+# Maximum number of concurrent transcode tasks
+# Low-memory hosts recommend setting to 1 to reduce memory usage from concurrent transcoding
 max_concurrent_transcodes = 2
 
 [maintenance]
-# Enable automatic database maintenance
+# Whether to enable automatic database maintenance
 enabled = true
 
-# Maintenance job interval (hours)
+# Maintenance job execution interval (hours)
 interval_hours = 24
 
-# Play history retention (days), 0 means never delete
+# Play history retention days (0 means never delete)
 history_retention_days = 90
 
-# Recommendation cache retention (days), 0 means never delete
+# Recommendation cache retention days (0 means never delete)
 recommendation_retention_days = 30
 
-# Enable incremental VACUUM (defragmentation)
+# Whether to enable incremental VACUUM (defragmentation)
 enable_vacuum = true
 
-# VACUUM trigger threshold (fragmentation percentage, 0-100)
+# VACUUM trigger fragmentation threshold (percentage, 0-100)
 # VACUUM is only executed when database fragmentation exceeds this value
 vacuum_threshold = 30.0
 
-# Similarity weight configuration
+# Recommendation strategy weights (frequency + recent + similarity, should sum to 1.0)
 [recommend.weights]
-artist = 0.3      # Artist similarity weight
-album = 0.2       # Album similarity weight
-genre = 0.3       # Genre similarity weight
-year = 0.1        # Year similarity weight
-play_count = 0.1  # Play count weight
+frequency = 0.4   # Frequently played strategy weight
+recent = 0.3      # Recently listened strategy weight
+similarity = 0.3  # Similar songs strategy weight
 
 [jobs]
-# Background job configuration
+# Background jobs configuration
 
-# Job retention (days for historical job records)
+# Job retention days (historical job records)
 retention_days = 30
 
 # Job cleanup interval (hours)
 cleanup_interval_hours = 24
 
 [subsonic]
-# Enable Subsonic API compatibility layer (/rest/ path)
+# Whether to enable Subsonic API compatibility layer (/rest/ path)
 enabled = true
 
-# Create admin user on first start via environment variables or /api/setup
+# Create admin via environment variables or /api/setup on first startup
 
 [web]
-# Enable Web frontend static file serving
+# Whether to enable web frontend static file serving
 enabled = true
 
 # Frontend build output directory
@@ -191,28 +211,68 @@ enabled = true
 path = "/app/web"
 
 [security]
-# JWT secret key (strongly recommended to set a fixed value,
-# otherwise all users must re-login after every service restart)
+# JWT secret (strongly recommended to set a fixed value; otherwise all users must re-login after service restart)
 # Generate with: openssl rand -hex 32
 # jwt_secret = "your-random-hex-secret-here"
 
-# Token validity period (hours), default 168 (7 days)
+# Subsonic password encryption pepper (optional, recommended to inject via MUSIC_KEY_PEPPER env var)
+# If not configured, the service will auto-generate and persist to /data/.zhiyin/key_pepper (default)
+# For manual key unification, recommended length >= 32
+# Generate with: openssl rand -hex 32
+# Example (docker-compose.yml):
+#   - MUSIC_KEY_PEPPER=your-random-hex-secret-here
+
+# Token expiry (hours), default 168 (7 days)
 token_expiry_hours = 168
 
-# Subsonic password encryption key (used to encrypt stored passwords for Subsonic Token auth)
-# Strongly recommended to change to a custom value!
+# Legacy compatibility field (deprecated): Subsonic password encryption no longer uses this config
+# Please set the MUSIC_KEY_PEPPER environment variable instead
 encryption_key = "zhiyin-default-key-CHANGE-ME"
 
 # CORS allowed origins (empty list or ["*"] allows all origins)
-# For production, configure with the actual frontend address
+# Production environments should configure the actual frontend address
 # cors_origins = ["https://music.example.com", "http://localhost:3000"]
 cors_origins = []
 
-# Login rate limiting: max attempts within the window (0 means unlimited)
+# Login rate limiting: maximum attempts within the time window (0 means no limit)
 login_rate_limit = 10
 
-# Login rate limiting window (seconds), default 300 (5 minutes)
+# Login rate limiting window (seconds), default 300 seconds (5 minutes)
 login_rate_window_secs = 300
+
+# ============================================================
+# [scrape] Metadata Scraping Configuration
+# ============================================================
+[scrape]
+# Whether to enable metadata scraping
+enabled = true
+
+# Scraping search sources (ordered by priority from high to low)
+# Options: netease, qq, kugou, kuwo, migu
+sources = ["netease", "qq", "kugou", "kuwo", "migu"]
+
+# Whether to automatically start scraping after scan completes
+auto_scrape_after_scan = false
+
+# Whether to stop searching other sources after finding the first high-score match
+stop_on_first_match = true
+
+# Auto-apply threshold (score 0-100)
+# Candidate matches with score >= this value are auto-applied; below requires manual review
+# Scoring dimensions: title similarity(40) + artist match(30) + album match(15) + metadata completeness(15)
+min_score_threshold = 50
+
+# Whether to save lyrics as .lrc file (in the same directory as the audio file)
+save_lyrics_file = false
+
+# Whether to save cover image files
+save_cover_file = false
+
+# HTTP request timeout (seconds)
+request_timeout_secs = 10
+
+# Maximum concurrent scraping tasks
+max_concurrent = 3
 
 [logging]
 # Log level: trace / debug / info / warn / error
@@ -226,10 +286,9 @@ format = "pretty"
 modules = []
 
 # ============================================================
-# Low-Memory Host Quick Reference (<=2GB RAM)
+# Low-Memory Host Quick Reference (≤2GB RAM)
 # ============================================================
-# If running on low-memory devices (NAS, Raspberry Pi, etc.),
-# consider adjusting the following settings:
+# If running on low-memory devices (NAS, Raspberry Pi, etc.), recommended adjustments:
 #
 #   database.pool_size = 2
 #   covers.cache_size_mb = 5
@@ -237,5 +296,4 @@ modules = []
 #   transcode.max_concurrent_transcodes = 1
 #
 # Also set mem_limit: 256m (or 192m) in docker-compose.yml
-# to cap container memory. The kernel will automatically reclaim
-# page cache without OOM-killing the process.
+# to cap container memory; the kernel will automatically reclaim page cache without OOM-killing the process.

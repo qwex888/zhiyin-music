@@ -7,7 +7,7 @@
 #
 # 配置热重载：
 #   - 本地开发：修改后自动重载（需重启服务）
-#   - Docker：执行 docker-compose kill -s SIGHUP zhiyin
+#   - Docker：执行 docker-compose kill -s SIGHUP zhiyin-music
 
 [server]
 # 监听地址
@@ -43,6 +43,26 @@ skip_small_files = true
 
 # 最小文件大小（字节），低于此值的文件将被跳过（默认 1024 = 1KB）
 min_file_size = 1024
+
+# ---------- STRM 网盘直链支持 ----------
+# 是否扫描 .strm 文件（文件内容为指向远程音频的 URL）
+scan_strm = true
+
+# STRM 播放模式：
+#   "proxy"    — 服务端代理转发（默认）
+#                通过系统 curl 命令跟随重定向链并流式转发音频数据给客户端，
+#                不暴露远程 URL；使用 curl -4 强制 IPv4 避免 CDN IPv6 不通问题，
+#                兼容国内 CDN（阿里云盘等）的 TLS 要求
+#   "redirect" — 智能重定向模式（推荐，节省带宽）
+#                启动时自动探测 IPv6 到 CDN 的连通性，每 5 分钟重检：
+#                  - IPv6 可达 → 307 重定向给客户端直连，节省服务端带宽
+#                  - IPv6 不通 → 自动降级为 proxy 模式，保证播放不中断
+#                日志中会显示当前状态切换信息
+strm_mode = "redirect"
+
+# 扫描时是否对 strm URL 执行远程探测（HTTP HEAD + ffprobe）获取真实文件大小、时长等属性
+# 开启后扫描速度会降低，但歌曲属性更完整；关闭则属性为空，播放时仍可正常工作
+strm_probe_remote = false
 
 [database]
 # 数据库文件路径
@@ -153,13 +173,11 @@ enable_vacuum = true
 # 只有当数据库碎片率超过此值时才执行 VACUUM
 vacuum_threshold = 30.0
 
-# 相似度权重配置
+# 推荐策略权重（frequency + recent + similarity，建议合计为 1.0）
 [recommend.weights]
-artist = 0.3      # 艺术家相似度权重
-album = 0.2       # 专辑相似度权重
-genre = 0.3       # 流派相似度权重
-year = 0.1        # 年代相似度权重
-play_count = 0.1  # 播放次数权重
+frequency = 0.4   # 高频播放策略权重
+recent = 0.3      # 最近常听策略权重
+similarity = 0.3  # 相似歌曲策略权重
 
 [jobs]
 # 后台任务配置
@@ -195,11 +213,18 @@ path = "/app/web"
 # 生成方式: openssl rand -hex 32
 # jwt_secret = "your-random-hex-secret-here"
 
+# Subsonic 密码加密 Pepper（可选，建议通过环境变量 MUSIC_KEY_PEPPER 注入）
+# 未配置时服务会自动生成并持久化到 /data/.zhiyin/key_pepper（默认）
+# 如需手动统一密钥，建议长度 >= 32
+# 生成方式: openssl rand -hex 32
+# 示例（docker-compose.yml）:
+#   - MUSIC_KEY_PEPPER=your-random-hex-secret-here
+
 # Token 有效期（小时），默认 168（7 天）
 token_expiry_hours = 168
 
-# Subsonic 密码加密密钥（用于加密存储 Subsonic Token 认证所需的密码）
-# 强烈建议修改为自定义值！
+# 兼容保留字段（已废弃）：Subsonic 密码加密不再使用该配置项
+# 请改为设置环境变量 MUSIC_KEY_PEPPER
 encryption_key = "zhiyin-default-key-CHANGE-ME"
 
 # CORS 允许的来源（空列表或 ["*"] 表示允许所有来源）
@@ -212,6 +237,40 @@ login_rate_limit = 10
 
 # 登录限流窗口期（秒），默认 300 秒（5 分钟）
 login_rate_window_secs = 300
+
+# ============================================================
+# [scrape] 刮削配置
+# ============================================================
+[scrape]
+# 是否启用刮削功能
+enabled = true
+
+# 刮削搜索源（按优先级从高到低排列）
+# 可选: netease, qq, kugou, kuwo, migu
+sources = ["netease", "qq", "kugou", "kuwo", "migu"]
+
+# 扫描完成后是否自动启动刮削
+auto_scrape_after_scan = false
+
+# 搜索到第一个高分匹配后是否停止继续搜索其他源
+stop_on_first_match = true
+
+# 自动应用阈值（百分制 0-100）
+# 候选匹配分数 >= 此值时自动应用，低于此值需人工审核
+# 评分维度：标题相似度(40) + 歌手匹配(30) + 专辑匹配(15) + 元数据完整度(15)
+min_score_threshold = 50
+
+# 是否保存歌词为 .lrc 文件（与音频文件同目录）
+save_lyrics_file = false
+
+# 是否保存封面图片文件
+save_cover_file = false
+
+# HTTP 请求超时（秒）
+request_timeout_secs = 10
+
+# 最大并发刮削数
+max_concurrent = 3
 
 [logging]
 # 日志级别：trace / debug / info / warn / error
