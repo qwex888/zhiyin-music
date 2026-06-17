@@ -881,7 +881,7 @@ MUSIC_ADMIN_PASSWORD=your_secure_password
 
 ## 💖 赞助与支持
 
-Zhiyin Music 知音是一个开源项目，完全免费使用。如果它对你有帮助，可以通过以下方式支持开发：
+Zhiyin Music 知音是一个发展中项目，完全免费使用。如果它对你有帮助，可以通过以下方式支持开发：
 
 - ⭐ 给项目一个 Star
 - 🐛 提交 Issue 或 PR

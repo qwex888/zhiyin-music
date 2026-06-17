@@ -883,7 +883,7 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 ## 💖 Sponsor & Support
 
-Zhiyin Music is an open-source project, completely free to use. If you find it helpful, consider supporting development:
+Zhiyin Music is an growing project, completely free to use. If you find it helpful, consider supporting development:
 
 - ⭐ Star this project
 - 🐛 Submit an Issue or PR
