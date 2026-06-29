@@ -180,6 +180,20 @@ curl -X POST http://localhost:8080/api/scan \
 
 - API docs: http://localhost:8080/swagger-ui
 
+### Option 2: Docker Command
+
+By default, it is recommended to mount the data directory, and the migration or deletion of reconstructed data will not be lost.
+
+```bash
+docker run --name zhiyin-music -v /path/to/your/music:/music -v ./data:/data -p 8080:8080 zhiyin-music:latest
+```
+
+If you only want to use Strm to quickly manage your music library, you can try:
+
+```bash
+docker run --name zhiyin-music -v /path/to/your/music:/music -p 8080:8080 zhiyin-music:latest
+```
+
 ## 📚 API Reference
 
 ### Core Endpoints

@@ -13,7 +13,7 @@ services:
       - ./music:/music:ro
       
       # 数据库目录（持久化）
-      #- ./data:/data
+      - ./data:/data
       
       # 封面缓存目录(可选， 如果想手动管理封面)
       #- ./covers:/covers
@@ -26,7 +26,7 @@ services:
       # 配置文件（可选，如需自定义配置请取消注释）
       # 首次使用：cp config.toml.example config.toml
       # 然后修改 config.toml 中的配置
-      - ./config.toml:/app/config.toml:ro
+      #- ./config.toml:/app/config.toml:ro
     
     environment:
       # 日志级别

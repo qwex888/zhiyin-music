@@ -15,7 +15,7 @@ services:
       - ./music:/music:ro
       
       # Database directory (persistent)
-      #- ./data:/data
+      - ./data:/data
 
       # Config file
       # First time: cp config.toml.example config.toml

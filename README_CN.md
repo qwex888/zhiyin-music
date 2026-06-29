@@ -136,11 +136,6 @@ volumes:
   - /path/to/your/music:/music:ro  # 修改为实际路径
 ```
 
-创建配置文件
-```bash
-cp config.toml.example config.toml
-```
-
 **启动服务**
 ```bash
 docker-compose up -d
@@ -175,9 +170,23 @@ curl -X POST http://localhost:8080/api/scan \
   -H "Authorization: Bearer <your-jwt-token>"
 ```
 
-8. **访问 API**
+**访问 API**
 
 - API 文档地址：http://localhost:8080/swagger-ui
+
+### 方式二: Docker Command
+
+默认推荐挂载数据目录，迁移或删除重建数据不丢失
+
+```bash
+docker run --name zhiyin-music -v /path/to/your/music:/music -v ./data:/data -p 8080:8080 zhiyin-music:latest
+```
+
+如果你只想使用 strm 快速管理音乐库，那么可以试试：
+
+```bash
+docker run --name zhiyin-music -v /path/to/your/music:/music -p 8080:8080 zhiyin-music:latest
+```
 
 ## 📚 API 文档
 
